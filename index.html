@@ -342,6 +342,16 @@
             transform: scale(1.1);
         }
         
+        .form-success {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: rgba(46, 125, 50, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #2e7d32;
+        }
+        
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -443,7 +453,8 @@
         <div class="container">
             <h2 class="section-title">Registration Form</h2>
             <div class="form-container">
-                <form id="registration-form" onsubmit="return validateForm()">
+                <!-- Formspree form with your email -->
+                <form id="registration-form" action="https://formspree.io/f/xdklqdbz" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="child-name">Child's Name</label>
                         <input type="text" id="child-name" name="child-name" required>
@@ -487,8 +498,18 @@
                         <input type="file" id="payment-proof" name="payment-proof" accept="image/*" required>
                     </div>
                     
+                    <!-- Formspree redirect to thank you page -->
+                    <input type="hidden" name="_next" value="https://yourwebsite.com/thank-you.html">
+                    
                     <button type="submit" class="submit-btn">Complete Registration</button>
                 </form>
+                
+                <!-- Success message (initially hidden) -->
+                <div class="form-success" id="form-success">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: #4fc3f7; margin-bottom: 15px;"></i>
+                    <h3>Registration Successful!</h3>
+                    <p>Thank you for registering. We will contact you shortly with course details.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -513,23 +534,27 @@
     </footer>
 
     <script>
-        function validateForm() {
-            const paymentProof = document.getElementById('payment-proof');
-            if (!paymentProof.value) {
-                alert('Please upload payment proof screenshot before submitting.');
-                paymentProof.focus();
-                return false;
-            }
-            
-            // In a real implementation, this would send the form data to a server
-            // and then send an email to the specified address
-            alert('Thank you for registering! We will contact you shortly with course details.');
-            document.getElementById('registration-form').reset();
-            return false; // Prevent form submission for this demo
-        }
-        
-        // Simple animation for elements when they come into view
+        // Form submission handling
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registration-form');
+            
+            form.addEventListener('submit', function(e) {
+                const paymentProof = document.getElementById('payment-proof');
+                if (!paymentProof.value) {
+                    e.preventDefault();
+                    alert('Please upload payment proof screenshot before submitting.');
+                    paymentProof.focus();
+                    return false;
+                }
+                
+                // Show success message after form submission
+                setTimeout(function() {
+                    document.getElementById('form-success').style.display = 'block';
+                    form.reset();
+                }, 1000);
+            });
+            
+            // Simple animation for elements when they come into view
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -549,7 +574,3 @@
     </script>
 </body>
 </html>
-
-
-
-
