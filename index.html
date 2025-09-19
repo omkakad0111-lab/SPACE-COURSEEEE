@@ -247,6 +247,8 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
+            min-width: 180px;
+            text-align: center;
         }
         
         .payment-option:hover {
@@ -257,6 +259,15 @@
         .payment-option.active {
             border-color: #7b68ee;
             background: rgba(79, 195, 247, 0.2);
+        }
+        
+        .payment-option.whatsapp-option {
+            background: rgba(37, 211, 102, 0.2);
+        }
+        
+        .payment-option.whatsapp-option.active {
+            border-color: #25d366;
+            background: rgba(37, 211, 102, 0.3);
         }
         
         .razorpay-btn {
@@ -276,7 +287,26 @@
             max-width: 300px;
         }
         
-        .razorpay-btn:hover {
+        .whatsapp-pay-btn {
+            background: linear-gradient(to right, #25d366, #128c7e);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 300px;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .razorpay-btn:hover, .whatsapp-pay-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
@@ -381,6 +411,29 @@
             margin: 0 auto;
         }
         
+        .whatsapp-box {
+            background: rgba(37, 211, 102, 0.1);
+            border: 2px solid #25d366;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .whatsapp-box h3 {
+            color: #25d366;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .whatsapp-box p {
+            color: #c0c0ff;
+            margin-bottom: 20px;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -420,12 +473,16 @@
             .payment-options {
                 flex-direction: column;
             }
+            
+            .payment-option {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/919607810111" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/919607810111?text=Hi!%20I'm%20interested%20in%20the%20AstronomyZone%20course%20for%20my%20child." class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -518,6 +575,7 @@
                     </div>
                     
                     <input type="hidden" name="payment-status" id="payment-status" value="pending">
+                    <input type="hidden" name="payment-method" id="payment-method" value="">
                     
                     <div class="payment-section">
                         <h3>Payment Information</h3>
@@ -525,8 +583,11 @@
                         <p>Please select your preferred payment method:</p>
                         
                         <div class="payment-options">
-                            <div class="payment-option active" id="razorpay-option">
+                            <div class="payment-option active" id="razorpay-option" data-method="razorpay">
                                 <i class="fas fa-credit-card"></i> Online Payment
+                            </div>
+                            <div class="payment-option whatsapp-option" id="whatsapp-option" data-method="whatsapp">
+                                <i class="fab fa-whatsapp"></i> Pay via WhatsApp
                             </div>
                         </div>
                     </div>
@@ -549,7 +610,18 @@
                     </div>
                     
                     <button type="button" class="razorpay-btn" id="rzp-button">Pay ₹1 & Complete Registration</button>
+                    <a href="#" class="whatsapp-pay-btn" id="whatsapp-button" style="display: none;">
+                        <i class="fab fa-whatsapp"></i> Pay via WhatsApp
+                    </a>
                 </form>
+
+                <div class="whatsapp-box">
+                    <h3>Prefer to book via WhatsApp?</h3>
+                    <p>Click the button below to directly message us on WhatsApp for registration and payment</p>
+                    <a href="https://wa.me/919607810111?text=Hi!%20I%20would%20like%20to%20register%20my%20child%20for%20the%20AstronomyZone%20course." class="whatsapp-pay-btn" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Contact via WhatsApp
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -578,10 +650,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('registration-form');
             const payButton = document.getElementById('rzp-button');
+            const whatsappButton = document.getElementById('whatsapp-button');
             const loading = document.getElementById('loading');
             const success = document.getElementById('form-success');
             const error = document.getElementById('form-error');
             const paymentStatus = document.getElementById('payment-status');
+            const paymentMethod = document.getElementById('payment-method');
+            const razorpayOption = document.getElementById('razorpay-option');
+            const whatsappOption = document.getElementById('whatsapp-option');
+            
+            // Set default payment method
+            paymentMethod.value = 'razorpay';
+            
+            // Payment option selection
+            razorpayOption.addEventListener('click', function() {
+                razorpayOption.classList.add('active');
+                whatsappOption.classList.remove('active');
+                payButton.style.display = 'block';
+                whatsappButton.style.display = 'none';
+                paymentMethod.value = 'razorpay';
+            });
+            
+            whatsappOption.addEventListener('click', function() {
+                whatsappOption.classList.add('active');
+                razorpayOption.classList.remove('active');
+                payButton.style.display = 'none';
+                whatsappButton.style.display = 'block';
+                paymentMethod.value = 'whatsapp';
+            });
             
             // Form validation function
             function validateForm() {
@@ -614,6 +710,40 @@
                 const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return re.test(email);
             }
+            
+            // Handle WhatsApp payment button
+            whatsappButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (!validateForm()) return;
+                
+                // Collect form data
+                const formData = {
+                    child_name: document.getElementById('child-name').value,
+                    age: document.getElementById('age').value,
+                    parent_name: document.getElementById('parent-name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                
+                // Create WhatsApp message
+                const message = `Hi! I would like to register my child for the AstronomyZone course.%0A%0A*Child's Name:* ${formData.child_name}%0A*Age:* ${formData.age}%0A*Parent's Name:* ${formData.parent_name}%0A*Email:* ${formData.email}%0A*Phone:* ${formData.phone}`;
+                
+                // Redirect to WhatsApp
+                window.open(`https://wa.me/919607810111?text=${message}`, '_blank');
+                
+                // Update payment status
+                paymentStatus.value = "pending_whatsapp";
+                
+                // Submit the form to Formspree
+                form.submit();
+                
+                // Show success message
+                success.style.display = 'block';
+                
+                // Scroll to success message
+                success.scrollIntoView({ behavior: 'smooth' });
+            });
             
             // Handle payment button click
             payButton.addEventListener('click', function() {
@@ -707,7 +837,7 @@
                 });
             }, { threshold: 0.1 });
             
-            document.querySelectorAll('.detail-card, .form-container').forEach(el => {
+            document.querySelectorAll('.detail-card, .form-container, .whatsapp-box').forEach(el => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(20px)';
                 el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
