@@ -527,7 +527,7 @@
                 <div class="detail-card">
                     <i class="fas fa-rupee-sign"></i>
                     <h3>Course Fee</h3>
-                    <p>₹2700 INR<br><br>Digital Certificate Included</p>
+                    <p>₹2700 INR<br>Digital Certificate Included</p>
                 </div>
                 <div class="detail-card">
                     <i class="fas fa-users"></i>
@@ -727,7 +727,7 @@
                 };
                 
                 // Create WhatsApp message
-                const message = `Hi! I would like to register my child for the AstronomyZone course.%0A%0A*Child's Name:* ${formData.child_name}%0A*Age:* ${formData.age}%0A*Parent's Name:* ${formData.parent_name}%0A*Email:* ${formData.email}%0A*Phone:* ${formData.phone}`;
+                const message = `Hi! I would like to register my child for the AstronomyZone course.%0A%0A*Child's Name:* ${formData.child_name}%0A*Age:* ${formData.age}%0A*Parent's Name:* ${formData.parent_name}%0A*Email:* ${formData.email}%0A*Phone:* ${formData.phone}%0A*Course Fee:* ₹2700 INR`;
                 
                 // Redirect to WhatsApp
                 window.open(`https://wa.me/919607810111?text=${message}`, '_blank');
@@ -767,7 +767,7 @@
                 // Initialize Razorpay payment
                 const options = {
                     "key": "rzp_test_RJbxfxqcLNJFem", // Your Razorpay Key ID
-                    "amount": 100, // Amount in paise (2700 INR = 270000 paise)
+                    "amount": 270000, // Amount in paise (2700 INR = 270000 paise)
                     "currency": "INR",
                     "name": "AstronomyZone",
                     "description": "Astronomy Course Enrollment",
@@ -847,5 +847,3 @@
     </script>
 </body>
 </html>
-
-
