@@ -301,6 +301,9 @@
         .contact-details {
             font-size: 1.2rem;
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
         .contact-details a {
@@ -514,6 +517,8 @@
                         <input type="tel" id="phone" name="phone" required>
                     </div>
                     
+                    <input type="hidden" name="payment-status" id="payment-status" value="pending">
+                    
                     <div class="payment-section">
                         <h3>Payment Information</h3>
                         <p>Course Fee: ₹1 INR (Special introductory price!)</p>
@@ -543,7 +548,7 @@
                         <p>There was an error processing your registration. Please try again or contact us directly.</p>
                     </div>
                     
-                    <button type="submit" class="razorpay-btn" id="rzp-button">Pay ₹1 & Complete Registration</button>
+                    <button type="button" class="razorpay-btn" id="rzp-button">Pay ₹1 & Complete Registration</button>
                 </form>
             </div>
         </div>
@@ -554,9 +559,9 @@
         <div class="container">
             <h2>Contact Us</h2>
             <div class="contact-details">
-                <p>Have questions? Reach out to us!</p>
                 <p><i class="fas fa-phone"></i> Phone: <a href="tel:+919607810111">+91 96078 10111</a></p>
                 <p><i class="fas fa-envelope"></i> Email: <a href="mailto:omkakad0111@gmail.com">omkakad0111@gmail.com</a></p>
+                <p><i class="fas fa-map-marker-alt"></i> Address: Pune, Maharashtra, India</p>
             </div>
         </div>
     </section>
@@ -576,6 +581,7 @@
             const loading = document.getElementById('loading');
             const success = document.getElementById('form-success');
             const error = document.getElementById('form-error');
+            const paymentStatus = document.getElementById('payment-status');
             
             // Form validation function
             function validateForm() {
@@ -609,12 +615,9 @@
                 return re.test(email);
             }
             
-            // Handle form submission
-            form.addEventListener('submit', function(e) {
-                if (!validateForm()) {
-                    e.preventDefault();
-                    return;
-                }
+            // Handle payment button click
+            payButton.addEventListener('click', function() {
+                if (!validateForm()) return;
                 
                 // Show loading state
                 payButton.disabled = true;
@@ -631,65 +634,59 @@
                     phone: document.getElementById('phone').value
                 };
                 
-                // For demo purposes, we'll prevent the actual Formspree submission
-                // and simulate the Razorpay payment process
-                e.preventDefault();
+                // Initialize Razorpay payment
+                const options = {
+                    "key": "rzp_test_RJbxfxqcLNJFem", // Your Razorpay Key ID
+                    "amount": 100, // Amount in paise (1 INR = 100 paise)
+                    "currency": "INR",
+                    "name": "AstronomyZone",
+                    "description": "Astronomy Course Enrollment",
+                    "handler": function(response) {
+                        // This function will be called after successful payment
+                        console.log(response);
+                        
+                        // Update payment status
+                        paymentStatus.value = "completed";
+                        
+                        // Submit the form to Formspree
+                        form.submit();
+                        
+                        // Show success message
+                        loading.style.display = 'none';
+                        success.style.display = 'block';
+                        payButton.disabled = false;
+                        
+                        // Scroll to success message
+                        success.scrollIntoView({ behavior: 'smooth' });
+                    },
+                    "prefill": {
+                        "name": formData.parent_name,
+                        "email": formData.email,
+                        "contact": formData.phone
+                    },
+                    "notes": {
+                        "child_name": formData.child_name,
+                        "age": formData.age
+                    },
+                    "theme": {
+                        "color": "#4fc3f7"
+                    }
+                };
                 
-                // Simulate server call to create order
-                setTimeout(() => {
-                    // This is a simulation - in a real implementation, you would get these values from your server
-                    const options = {
-                        "key": "rzp_test_RJbxfxqcLNJFem", // Replace with your Razorpay Key ID
-                        "amount": 100, // Amount in paise (1 INR = 100 paise)
-                        "currency": "INR",
-                        "name": "AstronomyZone",
-                        "description": "Astronomy Course Enrollment",
-                        "image": "https://example.com/your_logo", // Add your logo URL
-                        "handler": function(response) {
-                            // This function will be called after successful payment
-                            console.log(response);
-                            
-                            // Submit the form to Formspree after successful payment
-                            form.submit();
-                            
-                            // Show success message
-                            loading.style.display = 'none';
-                            success.style.display = 'block';
-                            payButton.disabled = false;
-                            
-                            // Scroll to success message
-                            success.scrollIntoView({ behavior: 'smooth' });
-                        },
-                        "prefill": {
-                            "name": formData.parent_name,
-                            "email": formData.email,
-                            "contact": formData.phone
-                        },
-                        "notes": {
-                            "child_name": formData.child_name,
-                            "age": formData.age
-                        },
-                        "theme": {
-                            "color": "#4fc3f7"
-                        }
-                    };
-                    
-                    // Initialize Razorpay payment
-                    const rzp = new Razorpay(options);
-                    rzp.open();
-                    
-                    // Hide loading when payment modal opens
-                    loading.style.display = 'none';
-                    payButton.disabled = false;
-                    
-                    // Handle payment errors
-                    rzp.on('payment.failed', function(response) {
-                        console.log(response.error);
-                        error.style.display = 'block';
-                        error.scrollIntoView({ behavior: 'smooth' });
-                    });
-                    
-                }, 1000); // Simulate server delay
+                // Initialize Razorpay payment
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+                // Hide loading when payment modal opens
+                loading.style.display = 'none';
+                payButton.disabled = false;
+                
+                // Handle payment errors
+                rzp.on('payment.failed', function(response) {
+                    console.log(response.error);
+                    // Don't show error message, just keep the form available for retry
+                    paymentStatus.value = "failed";
+                });
             });
             
             // Simple animation for elements when they come into view
@@ -712,4 +709,3 @@
     </script>
 </body>
 </html>
-
