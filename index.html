@@ -670,6 +670,13 @@
                     },
                     "theme": {
                         "color": "#4fc3f7"
+                    },
+                    "modal": {
+                        "ondismiss": function() {
+                            // Handle when user closes the modal without payment
+                            payButton.disabled = false;
+                            loading.style.display = 'none';
+                        }
                     }
                 };
                 
@@ -686,6 +693,7 @@
                     console.log(response.error);
                     // Don't show error message, just keep the form available for retry
                     paymentStatus.value = "failed";
+                    alert('Payment failed. Please try again.');
                 });
             });
             
