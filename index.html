@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Explorers - Kids Astronomy Course</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -279,12 +280,19 @@
             display: block;
             margin: 30px auto 0;
             transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px极速赛车开奖结果
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .submit-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            background: #7b68ee;
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .contact-info {
@@ -330,6 +338,7 @@
             border-radius: 50px;
             text-align: center;
             font-size: 30px;
+            box-shadow: 0 极速赛车开奖结果
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             z-index: 100;
             display: flex;
@@ -350,6 +359,37 @@
             border-radius: 10px;
             margin: 20px 0;
             border: 1px solid #2e7d32;
+        }
+        
+        .form-error {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: rgba(211, 47, 47, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #d32f2f;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #4fc3f7;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -380,6 +420,7 @@
             }
             
             .form-container {
+                padding: 20极速赛车开奖结果
                 padding: 20px;
             }
         }
@@ -388,6 +429,7 @@
 <body>
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/919607810111" class="whatsapp-float" target="_blank">
+        <i class极速赛车开奖结果
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -420,6 +462,7 @@
     </section>
 
     <!-- Course Details -->
+    <section id="course-details" class="course极速赛车开奖结果
     <section id="course-details" class="course-details">
         <div class="container">
             <h2 class="section-title">Course Details</h2>
@@ -453,8 +496,7 @@
         <div class="container">
             <h2 class="section-title">Registration Form</h2>
             <div class="form-container">
-                <!-- Updated Formspree form with proper file upload configuration -->
-                <form id="registration-form" action="https://formspree.io/f/mdkdbpyb" method="POST" enctype="multipart/form-data">
+                <form id="registration-form">
                     <div class="form-group">
                         <label for="child-name">Child's Name</label>
                         <input type="text" id="child-name" name="child-name" required>
@@ -495,24 +537,28 @@
                     
                     <div class="file-upload">
                         <p>Upload Payment Proof (Screenshot)</p>
-                        <input type="file" id="payment-proof" name="attachment" accept="image/*" required>
+                        <input type="file" id="payment-proof" name="payment-proof" accept="image/*" required>
                     </div>
                     
-                    <!-- Formspree configuration for file uploads -->
-                    <input type="hidden" name="_subject" value="New Space Explorers Registration">
-                    <input type="hidden" name="_replyto" value="">
-                    <input type="hidden" name="_cc" value="">
-                    <input type="text" name="_gotcha" style="display:none">
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Processing your registration...</p>
+                    </div>
                     
-                    <button type="submit" class="submit-btn">Complete Registration</button>
+                    <div class="form-success" id="form-success">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #4fc3f7; margin-bottom: 15px;"></i>
+                        <h3>Registration Successful!</h3>
+                        <p>Thank you for registering. We will contact you shortly with course details.</p>
+                    </div>
+                    
+                    <div class="form-error" id="form-error">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #f44336; margin-bottom: 15px;"></i>
+                        <h3>Registration Failed</h3>
+                        <p>There was an error processing your registration. Please try again or contact us directly.</p>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submit-btn">Complete Registration</button>
                 </form>
-                
-                <!-- Success message (initially hidden) -->
-                <div class="form-success" id="form-success">
-                    <i class="fas fa-check-circle" style="font-size: 3rem; color: #4fc3f7; margin-bottom: 15px;"></i>
-                    <h3>Registration Successful!</h3>
-                    <p>Thank you for registering. We will contact you shortly with course details.</p>
-                </div>
             </div>
         </div>
     </section>
@@ -537,29 +583,71 @@
     </footer>
 
     <script>
+        // Initialize EmailJS with your account credentials
+        (function() {
+            // Replace with your actual EmailJS user ID
+            emailjs.init("Cu3nFPBql8rLp4bMV");
+        })();
+        
         // Form submission handling
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('registration-form');
-            const emailField = document.getElementById('email');
-            
-            // Set the reply-to field to match the email entered
-            emailField.addEventListener('input', function() {
-                document.querySelector('input[name="_replyto"]').value = this.value;
-            });
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('loading');
+            const success = document.getElementById('form-success');
+            const error = document.getElementById('form-error');
             
             form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
                 const paymentProof = document.getElementById('payment-proof');
                 if (!paymentProof.value) {
-                    e.preventDefault();
                     alert('Please upload payment proof screenshot before submitting.');
                     paymentProof.focus();
                     return false;
                 }
                 
-                // Show success message after form submission
-                setTimeout(function() {
-                    document.getElementById('form-success').style.display = 'block';
-                }, 1000);
+                // Show loading state
+                submitBtn.disabled = true;
+                loading.style.display = 'block';
+                success.style.display = 'none';
+                error.style.display = 'none';
+                
+                // Prepare form data
+                const formData = {
+                    child_name: document.getElementById('child-name').value,
+                    age: document.getElementById('age').value,
+                    parent_name: document.getElementById('parent-name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    payment_proof: document.getElementById('payment-proof').value
+                };
+                
+                // Send email using EmailJS
+                emailjs.send(
+                    'YOUR_EMAILJS_SERVICE_ID', // Replace with your EmailJS service ID
+                    'YOUR_EMAILJS_TEMPLATE_ID', // Replace with your EmailJS template ID
+                    formData
+                ).then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    // Show success message
+                    loading.style.display = 'none';
+                    success.style.display = 'block';
+                    form.reset();
+                    submitBtn.disabled = false;
+                    
+                    // Scroll to success message
+                    success.scrollIntoView({ behavior: 'smooth' });
+                }, function(err) {
+                    console.log('FAILED...', err);
+                    // Show error message
+                    loading.style.display = 'none';
+                    error.style.display = 'block';
+                    submitBtn.disabled = false;
+                    
+                    // Scroll to error message
+                    error.scrollIntoView({ behavior: 'smooth' });
+                });
             });
             
             // Simple animation for elements when they come into view
@@ -582,4 +670,3 @@
     </script>
 </body>
 </html>
-
