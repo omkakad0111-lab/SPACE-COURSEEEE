@@ -453,8 +453,8 @@
         <div class="container">
             <h2 class="section-title">Registration Form</h2>
             <div class="form-container">
-                <!-- Formspree form with your email -->
-                <form id="registration-form" action="https://formspree.io/f/xdklqdbz" method="POST" enctype="multipart/form-data">
+                <!-- Updated Formspree form with proper file upload configuration -->
+                <form id="registration-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="child-name">Child's Name</label>
                         <input type="text" id="child-name" name="child-name" required>
@@ -495,11 +495,14 @@
                     
                     <div class="file-upload">
                         <p>Upload Payment Proof (Screenshot)</p>
-                        <input type="file" id="payment-proof" name="payment-proof" accept="image/*" required>
+                        <input type="file" id="payment-proof" name="attachment" accept="image/*" required>
                     </div>
                     
-                    <!-- Formspree redirect to thank you page -->
-                    <input type="hidden" name="_next" value="https://yourwebsite.com/thank-you.html">
+                    <!-- Formspree configuration for file uploads -->
+                    <input type="hidden" name="_subject" value="New Space Explorers Registration">
+                    <input type="hidden" name="_replyto" value="">
+                    <input type="hidden" name="_cc" value="">
+                    <input type="text" name="_gotcha" style="display:none">
                     
                     <button type="submit" class="submit-btn">Complete Registration</button>
                 </form>
@@ -537,6 +540,12 @@
         // Form submission handling
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('registration-form');
+            const emailField = document.getElementById('email');
+            
+            // Set the reply-to field to match the email entered
+            emailField.addEventListener('input', function() {
+                document.querySelector('input[name="_replyto"]').value = this.value;
+            });
             
             form.addEventListener('submit', function(e) {
                 const paymentProof = document.getElementById('payment-proof');
@@ -550,7 +559,6 @@
                 // Show success message after form submission
                 setTimeout(function() {
                     document.getElementById('form-success').style.display = 'block';
-                    form.reset();
                 }, 1000);
             });
             
